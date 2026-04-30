@@ -1,35 +1,38 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
+import { Head } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const courses = [
-  { id: 1, code: 'NURS-301', name: 'Fundamentals of Nursing Care' },
-  { id: 2, code: 'NURS-410', name: 'Medical-Surgical Nursing' },
-  { id: 3, code: 'NURS-422', name: 'Pediatric Nursing Practicum' },
-  { id: 4, code: 'NURS-501', name: 'Community Health Nursing' },
-  { id: 5, code: 'NURS-512', name: 'Critical Care & ICU Practicum' },
-]
+// ─── Props from Inertia (Server) ─ Falls back to Mock Data ────────────────────
+const props = defineProps({
+  courses: { type: Array, default: () => [
+    { id: 1, code: 'NURS-301', name: 'Fundamentals of Nursing Care' },
+    { id: 2, code: 'NURS-410', name: 'Medical-Surgical Nursing' },
+    { id: 3, code: 'NURS-422', name: 'Pediatric Nursing Practicum' },
+    { id: 4, code: 'NURS-501', name: 'Community Health Nursing' },
+    { id: 5, code: 'NURS-512', name: 'Critical Care & ICU Practicum' },
+  ]},
+  teachers: { type: Array, default: () => [
+    { id: 1, name: 'Assoc. Prof. Siriporn Nakamura' },
+    { id: 2, name: 'Lect. Wanchai Boonmee' },
+    { id: 3, name: 'Asst. Prof. Kanokwan Thongdee' },
+    { id: 4, name: 'Lect. Pranom Chaiyasit' },
+  ]},
+  rooms: { type: Array, default: () => [
+    { id: 1, name: 'Lecture Hall A', code: 'LH-A', capacity: 80 },
+    { id: 2, name: 'Clinical Lab 1', code: 'CL-01', capacity: 30 },
+    { id: 3, name: 'Simulation Room B', code: 'SIM-B', capacity: 20 },
+    { id: 4, name: 'Seminar Room 201', code: 'SR-201', capacity: 50 },
+    { id: 5, name: 'Anatomy Lab', code: 'ANAT-1', capacity: 40 },
+  ]},
+  bookedSlots: { type: Array, default: () => [] },
+})
 
-const teachers = [
-  { id: 1, name: 'Assoc. Prof. Siriporn Nakamura', title: 'RN, PhD' },
-  { id: 2, name: 'Lect. Wanchai Boonmee', title: 'RN, MSN' },
-  { id: 3, name: 'Asst. Prof. Kanokwan Thongdee', title: 'RN, PhD' },
-  { id: 4, name: 'Lect. Pranom Chaiyasit', title: 'RN, MSN' },
-]
+const courses = computed(() => props.courses)
+const teachers = computed(() => props.teachers)
+const rooms = computed(() => props.rooms)
+const bookedSlots = computed(() => props.bookedSlots)
 
-const rooms = [
-  { id: 1, name: 'Lecture Hall A', code: 'LH-A', capacity: 80 },
-  { id: 2, name: 'Clinical Lab 1', code: 'CL-01', capacity: 30 },
-  { id: 3, name: 'Simulation Room B', code: 'SIM-B', capacity: 20 },
-  { id: 4, name: 'Seminar Room 201', code: 'SR-201', capacity: 50 },
-  { id: 5, name: 'Anatomy Lab', code: 'ANAT-1', capacity: 40 },
-]
-
-// Mock booked slots for conflict detection
-const bookedSlots = [
-  { user_id: 2, room_id: 3, teaching_date: '2025-06-10', start_time: '09:00', end_time: '12:00' },
-  { user_id: 1, room_id: 1, teaching_date: '2025-06-12', start_time: '13:00', end_time: '16:00' },
-]
 
 // ─── Form State ───────────────────────────────────────────────────────────────
 const form = reactive({
@@ -52,7 +55,7 @@ let debounceTimer  = null
 
 // ─── Computed ─────────────────────────────────────────────────────────────────
 const selectedRoom = computed(() =>
-  rooms.find(r => r.id === Number(form.room_id)) || null
+  rooms.value.find(r => r.id === Number(form.room_id)) || null
 )
 
 const canSubmit = computed(() =>
@@ -102,7 +105,7 @@ async function checkConflict() {
   await new Promise(resolve => setTimeout(resolve, 700))
 
   // 1. Hard conflict: teacher or room double-booking
-  for (const slot of bookedSlots) {
+  for (const slot of bookedSlots.value) {
     const sameDate = slot.teaching_date === form.teaching_date
     const sameTeacher = slot.user_id === Number(form.user_id)
     const sameRoom = slot.room_id === Number(form.room_id)
@@ -169,6 +172,8 @@ function resetForm() {
 </script>
 
 <template>
+  <Head title="สร้างตารางสอน" />
+  <AuthenticatedLayout>
   <div class="min-h-screen bg-slate-50 font-sans py-10 px-4">
 
     <!-- ── Page Header ─────────────────────────────────────────────────────── -->
@@ -180,11 +185,11 @@ function resetForm() {
           </svg>
         </div>
         <div>
-          <p class="text-xs font-semibold text-blue-600 uppercase tracking-widest">Faculty of Nursing</p>
-          <h1 class="text-xl font-bold text-slate-800 leading-tight">Schedule Management</h1>
+          <p class="text-xs font-semibold text-blue-600 uppercase tracking-widest">คณะพยาบาลศาสตร์</p>
+          <h1 class="text-xl font-bold text-slate-800 leading-tight">ระบบจัดตารางสอน</h1>
         </div>
       </div>
-      <p class="text-sm text-slate-500 mt-1 ml-11">Create and manage teaching &amp; practicum sessions with real-time conflict detection.</p>
+      <p class="text-sm text-slate-500 mt-1 ml-11">สร้างและจัดการตารางสอน/ฝึกปฏิบัติ พร้อมระบบตรวจจับเวลาซ้อนอัตโนมัติ</p>
     </div>
 
     <!-- ── Main Form Card ──────────────────────────────────────────────────── -->
@@ -195,12 +200,12 @@ function resetForm() {
         <div class="px-8 pt-7 pb-5 border-b border-slate-100">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-base font-semibold text-slate-800">New Schedule Entry</h2>
-              <p class="text-xs text-slate-400 mt-0.5">All fields marked with * are required</p>
+              <h2 class="text-base font-semibold text-slate-800">เพิ่มตารางสอนใหม่</h2>
+              <p class="text-xs text-slate-400 mt-0.5">ช่องที่มีเครื่องหมาย * จำเป็นต้องกรอก</p>
             </div>
             <!-- Progress Pill -->
             <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 font-medium">{{ formProgress }}% complete</span>
+              <span class="text-xs text-slate-400 font-medium">กรอกแล้ว {{ formProgress }}%</span>
               <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   class="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
@@ -223,8 +228,8 @@ function resetForm() {
           >
             <span class="mt-0.5 text-base leading-none">✅</span>
             <div>
-              <p class="font-semibold">Schedule saved successfully</p>
-              <p class="text-emerald-600 text-xs mt-0.5">The new session has been added to the timetable and all parties will be notified.</p>
+              <p class="font-semibold">บันทึกตารางสอนเรียบร้อยแล้ว</p>
+              <p class="text-emerald-600 text-xs mt-0.5">รายการใหม่ถูกเพิ่มลงในตารางเรียบร้อย ผู้ที่เกี่ยวข้องจะได้รับการแจ้งเตือน</p>
             </div>
           </div>
         </Transition>
@@ -236,21 +241,21 @@ function resetForm() {
           <div>
             <div class="flex items-center gap-2 mb-4">
               <span class="flex-shrink-0 w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</span>
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Academic Information</h3>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">ข้อมูลรายวิชา</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
               <!-- Course -->
               <div class="md:col-span-2">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Course <span class="text-red-400">*</span>
+                  รายวิชา <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
                   <select
                     v-model="form.course_id"
                     class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                   >
-                    <option value="" disabled>Select a course...</option>
+                    <option value="" disabled>เลือกรายวิชา...</option>
                     <option v-for="c in courses" :key="c.id" :value="c.id">
                       [{{ c.code }}] {{ c.name }}
                     </option>
@@ -264,12 +269,12 @@ function resetForm() {
               <!-- Student Group -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Student Group <span class="text-red-400">*</span>
+                  กลุ่มนักศึกษา <span class="text-red-400">*</span>
                 </label>
                 <input
                   v-model="form.student_group"
                   type="text"
-                  placeholder="e.g. Group 2.1"
+                  placeholder="เช่น กลุ่ม 2.1"
                   class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150 placeholder:text-slate-300"
                 />
               </div>
@@ -277,17 +282,17 @@ function resetForm() {
               <!-- Student Count -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Student Count <span class="text-red-400">*</span>
+                  จำนวนนักศึกษา <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
                   <input
                     v-model="form.student_count"
                     type="number"
                     min="1"
-                    placeholder="e.g. 35"
+                    placeholder="เช่น 35"
                     class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150 placeholder:text-slate-300"
                   />
-                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">students</span>
+                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">คน</span>
                 </div>
               </div>
 
@@ -301,21 +306,21 @@ function resetForm() {
           <div>
             <div class="flex items-center gap-2 mb-4">
               <span class="flex-shrink-0 w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">2</span>
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Instructor &amp; Venue</h3>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">อาจารย์ผู้สอน & สถานที่</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
               <!-- Teacher -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Instructor <span class="text-red-400">*</span>
+                  อาจารย์ผู้สอน <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
                   <select
                     v-model="form.user_id"
                     class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                   >
-                    <option value="" disabled>Select instructor...</option>
+                    <option value="" disabled>เลือกอาจารย์...</option>
                     <option v-for="t in teachers" :key="t.id" :value="t.id">
                       {{ t.name }}
                     </option>
@@ -329,16 +334,16 @@ function resetForm() {
               <!-- Room -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Room / Location <span class="text-red-400">*</span>
+                  ห้องเรียน / สถานที่ <span class="text-red-400">*</span>
                 </label>
                 <div class="relative">
                   <select
                     v-model="form.room_id"
                     class="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                   >
-                    <option value="" disabled>Select room...</option>
+                    <option value="" disabled>เลือกห้องเรียน...</option>
                     <option v-for="r in rooms" :key="r.id" :value="r.id">
-                      {{ r.name }} ({{ r.code }}) — Cap. {{ r.capacity }}
+                      {{ r.name }} ({{ r.code }}) — จุได้ {{ r.capacity }} คน
                     </option>
                   </select>
                   <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -350,7 +355,7 @@ function resetForm() {
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
                   </svg>
-                  Maximum capacity: <strong class="text-slate-600">{{ selectedRoom.capacity }} students</strong>
+                  ความจุสูงสุด: <strong class="text-slate-600">{{ selectedRoom.capacity }} คน</strong>
                 </p>
               </div>
 
@@ -364,14 +369,14 @@ function resetForm() {
           <div>
             <div class="flex items-center gap-2 mb-4">
               <span class="flex-shrink-0 w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">3</span>
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Schedule Date &amp; Time</h3>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">วันที่ & เวลาสอน</h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
               <!-- Date -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Teaching Date <span class="text-red-400">*</span>
+                  วันที่สอน <span class="text-red-400">*</span>
                 </label>
                 <input
                   v-model="form.teaching_date"
@@ -383,7 +388,7 @@ function resetForm() {
               <!-- Start Time -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Start Time <span class="text-red-400">*</span>
+                  เวลาเริ่ม <span class="text-red-400">*</span>
                 </label>
                 <input
                   v-model="form.start_time"
@@ -395,7 +400,7 @@ function resetForm() {
               <!-- End Time -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
-                  End Time <span class="text-red-400">*</span>
+                  เวลาสิ้นสุด <span class="text-red-400">*</span>
                 </label>
                 <input
                   v-model="form.end_time"
@@ -418,7 +423,7 @@ function resetForm() {
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                Checking for scheduling conflicts...
+                กำลังตรวจสอบตารางเวลาซ้อน...
               </div>
             </Transition>
           </div>
@@ -442,9 +447,9 @@ function resetForm() {
                   </svg>
                 </div>
                 <div>
-                  <p class="text-sm font-semibold text-red-800">Scheduling Conflict Detected</p>
+                  <p class="text-sm font-semibold text-red-800">พบตารางเวลาซ้อน!</p>
                   <p class="text-xs text-red-600 mt-1 leading-relaxed">{{ conflict.message }}</p>
-                  <p class="text-xs text-red-500 mt-2 font-medium">Submission is blocked until this conflict is resolved.</p>
+                  <p class="text-xs text-red-500 mt-2 font-medium">ไม่สามารถบันทึกได้จนกว่าจะแก้ไขปัญหานี้</p>
                 </div>
               </div>
             </div>
@@ -462,9 +467,9 @@ function resetForm() {
                   </svg>
                 </div>
                 <div>
-                  <p class="text-sm font-semibold text-amber-800">Capacity Advisory</p>
+                  <p class="text-sm font-semibold text-amber-800">แจ้งเตือนความจุห้อง</p>
                   <p class="text-xs text-amber-700 mt-1 leading-relaxed">{{ conflict.message }}</p>
-                  <p class="text-xs text-amber-600 mt-2 font-medium">You may still submit, but please review the venue selection.</p>
+                  <p class="text-xs text-amber-600 mt-2 font-medium">ยังสามารถบันทึกได้ แต่กรุณาตรวจสอบสถานที่อีกครั้ง</p>
                 </div>
               </div>
             </div>
@@ -482,22 +487,22 @@ function resetForm() {
             <svg class="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
             </svg>
-            Reset Form
+            ล้างฟอร์ม
           </button>
 
           <div class="flex items-center gap-3">
             <!-- Conflict badge summary -->
             <div v-if="conflict.type === 'error'" class="flex items-center gap-1.5 text-xs text-red-500 font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/>
-              Blocked
+              ถูกบล็อก
             </div>
             <div v-else-if="conflict.type === 'warning'" class="flex items-center gap-1.5 text-xs text-amber-500 font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500"/>
-              1 Advisory
+              1 คำเตือน
             </div>
             <div v-else-if="!isChecking && form.teaching_date && form.start_time && form.end_time" class="flex items-center gap-1.5 text-xs text-emerald-500 font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"/>
-              No Conflicts
+              ไม่มีเวลาซ้อน
             </div>
 
             <!-- Submit Button -->
@@ -545,7 +550,7 @@ function resetForm() {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
 
-              <span>{{ isSubmitting ? 'Saving...' : isChecking ? 'Validating...' : 'Save Schedule' }}</span>
+              <span>{{ isSubmitting ? 'กำลังบันทึก...' : isChecking ? 'กำลังตรวจสอบ...' : 'บันทึกตารางสอน' }}</span>
             </button>
           </div>
         </div>
@@ -554,9 +559,10 @@ function resetForm() {
 
       <!-- ── Hint Footer ──────────────────────────────────────────────────── -->
       <p class="text-center text-xs text-slate-400 mt-5">
-        <span class="font-semibold text-slate-500">Tip:</span>
-        To test conflict detection, select <strong class="text-slate-500">Lect. Wanchai Boonmee</strong> + <strong class="text-slate-500">Simulation Room B</strong> on <strong class="text-slate-500">2025-06-10</strong> between <strong class="text-slate-500">09:00–12:00</strong>.
+        <span class="font-semibold text-slate-500">ทดลองใช้งาน:</span>
+        หากต้องการทดสอบระบบตรวจจับเวลาซ้อน ให้เลือก <strong class="text-slate-500">Lect. Wanchai Boonmee</strong> + <strong class="text-slate-500">Simulation Room B</strong> ในวันที่ <strong class="text-slate-500">2025-06-10</strong> เวลา <strong class="text-slate-500">09:00–12:00</strong>
       </p>
     </div>
   </div>
+  </AuthenticatedLayout>
 </template>

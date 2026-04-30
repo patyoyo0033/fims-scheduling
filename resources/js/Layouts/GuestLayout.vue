@@ -11,14 +11,14 @@ import { Link } from '@inertiajs/vue3';
             <Link href="/">
                 <!-- แทนที่โลโก้เริ่มต้นด้วยข้อความหรือไอคอนที่เกี่ยวข้องกับพยาบาล -->
                 <div class="flex items-center justify-center w-24 h-24 bg-blue-600 text-white rounded-full shadow-lg">
-                    <span class="text-3xl font-bold">NS</span>
+                    <img src="660998396_846615291810454_7039158697935387368_n.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
             </Link>
         </div>
         
         <div class="mt-4 text-center">
-            <h2 class="text-2xl font-bold text-blue-800">Faculty of Nursing</h2>
-            <p class="text-blue-600">Scheduling System (FIMS)</p>
+            <h2 class="text-2xl font-bold text-blue-800">กังฟูแพนด้าอิอิ</h2>
+            <p class="text-blue-600">แพนด้าสามตัวนี้แหละที่จะขวางเจ้า!!!</p>
         </div>
 
         <div

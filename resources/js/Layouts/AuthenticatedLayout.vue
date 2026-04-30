@@ -37,7 +37,13 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
-                                    Dashboard
+                                    หน้าหลัก
+                                </NavLink>
+                                <NavLink
+                                    :href="route('schedules.create')"
+                                    :active="route().current('schedules.create')"
+                                >
+                                    สร้างตารางสอน
                                 </NavLink>
                             </div>
                         </div>
@@ -74,14 +80,14 @@ const showingNavigationDropdown = ref(false);
                                         <DropdownLink
                                             :href="route('profile.edit')"
                                         >
-                                            Profile
+                                            โปรไฟล์
                                         </DropdownLink>
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            ออกจากระบบ
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
@@ -144,7 +150,13 @@ const showingNavigationDropdown = ref(false);
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
-                            Dashboard
+                            หน้าหลัก
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('schedules.create')"
+                            :active="route().current('schedules.create')"
+                        >
+                            สร้างตารางสอน
                         </ResponsiveNavLink>
                     </div>
 
@@ -165,14 +177,14 @@ const showingNavigationDropdown = ref(false);
 
                         <div class="mt-3 space-y-1">
                             <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
+                                โปรไฟล์
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 :href="route('logout')"
                                 method="post"
                                 as="button"
                             >
-                                Log Out
+                                ออกจากระบบ
                             </ResponsiveNavLink>
                         </div>
                     </div>
