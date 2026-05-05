@@ -45,6 +45,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     สร้างตารางสอน
                                 </NavLink>
+                                <NavLink
+                                    :href="route('master-data.index')"
+                                    :active="route().current('master-data.index')"
+                                >
+                                    จัดการข้อมูล (Master Data)
+                                </NavLink>
                             </div>
                         </div>
 
@@ -157,6 +163,12 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('schedules.create')"
                         >
                             สร้างตารางสอน
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('master-data.index')"
+                            :active="route().current('master-data.index')"
+                        >
+                            จัดการข้อมูล (Master Data)
                         </ResponsiveNavLink>
                     </div>
 

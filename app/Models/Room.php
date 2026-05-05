@@ -14,6 +14,14 @@ class Room extends Model
         'is_active',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'capacity' => 'integer',
+        ];
+    }
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
