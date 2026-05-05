@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 
 // ─── Props from Inertia (Server) ─ Falls back to Mock Data ────────────────────
@@ -34,8 +34,8 @@ const rooms = computed(() => props.rooms)
 const bookedSlots = computed(() => props.bookedSlots)
 
 
-// ─── Form State ───────────────────────────────────────────────────────────────
-const form = reactive({
+// ─── Form State (Inertia useForm) ─────────────────────────────────────────────
+const form = useForm({
   course_id: '',
   user_id: '',
   room_id: '',
@@ -48,7 +48,6 @@ const form = reactive({
 
 // ─── UI State ─────────────────────────────────────────────────────────────────
 const isChecking   = ref(false)
-const isSubmitting = ref(false)
 const submitSuccess = ref(false)
 const conflict     = reactive({ type: null, message: '' }) // 'error' | 'warning' | null
 let debounceTimer  = null
@@ -60,7 +59,7 @@ const selectedRoom = computed(() =>
 
 const canSubmit = computed(() =>
   !isChecking.value &&
-  !isSubmitting.value &&
+  !form.processing &&
   conflict.type !== 'error' &&
   form.course_id &&
   form.user_id &&
@@ -114,13 +113,13 @@ async function checkConflict() {
     if (sameDate && overlapping) {
       if (sameTeacher && form.user_id) {
         conflict.type = 'error'
-        conflict.message = '🚨 Conflict: This teacher is already assigned to another schedule during the selected time slot.'
+        conflict.message = '🚨 พบตารางซ้อน: อาจารย์ท่านนี้มีตารางสอนในช่วงเวลาที่เลือกแล้ว กรุณาเลือกเวลาอื่น'
         isChecking.value = false
         return
       }
       if (sameRoom && form.room_id) {
         conflict.type = 'error'
-        conflict.message = '🚨 Conflict: This room is already booked during the selected time slot. Please choose a different room or time.'
+        conflict.message = '🚨 พบตารางซ้อน: ห้องเรียนนี้ถูกจองในช่วงเวลาที่เลือกแล้ว กรุณาเลือกห้องอื่นหรือเปลี่ยนเวลา'
         isChecking.value = false
         return
       }
@@ -132,7 +131,7 @@ async function checkConflict() {
     const count = Number(form.student_count)
     if (count > selectedRoom.value.capacity) {
       conflict.type = 'warning'
-      conflict.message = `⚠️ Warning: Student count (${count}) exceeds the capacity of ${selectedRoom.value.name} (max ${selectedRoom.value.capacity}). You may still submit, but consider a larger venue.`
+      conflict.message = `⚠️ คำเตือน: จำนวนนักศึกษา (${count} คน) เกินความจุของ ${selectedRoom.value.name} (สูงสุด ${selectedRoom.value.capacity} คน) ยังสามารถบันทึกได้ แต่กรุณาพิจารณาสถานที่ที่ใหญ่กว่านี้`
     }
   }
 
@@ -150,21 +149,32 @@ watch(
   debouncedCheck
 )
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
-async function handleSubmit() {
+// ─── Submit (Inertia POST) ────────────────────────────────────────────────────
+function handleSubmit() {
   if (!canSubmit.value) return
-  isSubmitting.value = true
 
-  // Simulate API submission
-  await new Promise(resolve => setTimeout(resolve, 1500))
-
-  isSubmitting.value = false
-  submitSuccess.value = true
-  setTimeout(() => { submitSuccess.value = false }, 4000)
+  form.post(route('schedules.store'), {
+    preserveScroll: true,
+    onSuccess: () => {
+      submitSuccess.value = true
+      conflict.type = null
+      conflict.message = ''
+      form.reset()
+      setTimeout(() => { submitSuccess.value = false }, 4000)
+    },
+    onError: (errors) => {
+      // ดักจับ Error เรื่องเวลาซ้อนจาก Backend (ScheduleController)
+      if (errors.conflict) {
+        conflict.type = 'error'
+        conflict.message = errors.conflict
+      }
+    },
+  })
 }
 
 function resetForm() {
-  Object.keys(form).forEach(k => { form[k] = '' })
+  form.reset()
+  form.clearErrors()
   conflict.type = null
   conflict.message = ''
   submitSuccess.value = false
@@ -264,6 +274,7 @@ function resetForm() {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                   </svg>
                 </div>
+                <p v-if="form.errors.course_id" class="mt-1 text-xs text-red-500">{{ form.errors.course_id }}</p>
               </div>
 
               <!-- Student Group -->
@@ -277,6 +288,7 @@ function resetForm() {
                   placeholder="เช่น กลุ่ม 2.1"
                   class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150 placeholder:text-slate-300"
                 />
+                <p v-if="form.errors.student_group" class="mt-1 text-xs text-red-500">{{ form.errors.student_group }}</p>
               </div>
 
               <!-- Student Count -->
@@ -294,6 +306,7 @@ function resetForm() {
                   />
                   <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">คน</span>
                 </div>
+                <p v-if="form.errors.student_count" class="mt-1 text-xs text-red-500">{{ form.errors.student_count }}</p>
               </div>
 
             </div>
@@ -329,9 +342,8 @@ function resetForm() {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                   </svg>
                 </div>
+                <p v-if="form.errors.user_id" class="mt-1 text-xs text-red-500">{{ form.errors.user_id }}</p>
               </div>
-
-              <!-- Room -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
                   ห้องเรียน / สถานที่ <span class="text-red-400">*</span>
@@ -357,6 +369,7 @@ function resetForm() {
                   </svg>
                   ความจุสูงสุด: <strong class="text-slate-600">{{ selectedRoom.capacity }} คน</strong>
                 </p>
+                <p v-if="form.errors.room_id" class="mt-1 text-xs text-red-500">{{ form.errors.room_id }}</p>
               </div>
 
             </div>
@@ -383,9 +396,8 @@ function resetForm() {
                   type="date"
                   class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                 />
+                <p v-if="form.errors.teaching_date" class="mt-1 text-xs text-red-500">{{ form.errors.teaching_date }}</p>
               </div>
-
-              <!-- Start Time -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
                   เวลาเริ่ม <span class="text-red-400">*</span>
@@ -395,9 +407,8 @@ function resetForm() {
                   type="time"
                   class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                 />
+                <p v-if="form.errors.start_time" class="mt-1 text-xs text-red-500">{{ form.errors.start_time }}</p>
               </div>
-
-              <!-- End Time -->
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">
                   เวลาสิ้นสุด <span class="text-red-400">*</span>
@@ -407,6 +418,7 @@ function resetForm() {
                   type="time"
                   class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-150"
                 />
+                <p v-if="form.errors.end_time" class="mt-1 text-xs text-red-500">{{ form.errors.end_time }}</p>
               </div>
 
             </div>
@@ -519,7 +531,7 @@ function resetForm() {
             >
               <!-- Spinner (loading) -->
               <svg
-                v-if="isSubmitting || isChecking"
+                v-if="form.processing || isChecking"
                 class="w-4 h-4 animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -550,7 +562,7 @@ function resetForm() {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
 
-              <span>{{ isSubmitting ? 'กำลังบันทึก...' : isChecking ? 'กำลังตรวจสอบ...' : 'บันทึกตารางสอน' }}</span>
+              <span>{{ form.processing ? 'กำลังบันทึก...' : isChecking ? 'กำลังตรวจสอบ...' : 'บันทึกตารางสอน' }}</span>
             </button>
           </div>
         </div>
