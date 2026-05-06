@@ -45,7 +45,7 @@ const stats = ref([
 ])
 
 const quickActions = ref([
-  { label: 'สร้างตารางสอน', route: 'schedules.create', icon: 'plus' },
+  { label: 'ตารางสอน', route: 'schedules.index', icon: 'plus' },
 ])
 </script>
 
@@ -61,7 +61,7 @@ const quickActions = ref([
                 </div>
                 <div>
                     <Link
-                        :href="route('schedules.create')"
+                        :href="route('schedules.index')"
                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-nursing-600 hover:bg-nursing-700 shadow-md shadow-nursing-600/20 hover:shadow-lg hover:shadow-nursing-600/25 transition-all duration-300 hover:-translate-y-0.5"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -123,7 +123,7 @@ const quickActions = ref([
                                 คุณสามารถเริ่มสร้างตารางสอน จัดการห้องเรียน และตรวจสอบตารางเวลาซ้อนได้ทันทีจากเมนูด้านบน
                             </p>
                             <Link
-                                :href="route('schedules.create')"
+                                :href="route('schedules.index')"
                                 class="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nursing-700 hover:bg-nursing-50 shadow-sm transition-all duration-200"
                             >
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

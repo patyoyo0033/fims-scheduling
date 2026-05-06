@@ -40,10 +40,10 @@ const showingNavigationDropdown = ref(false);
                                     หน้าหลัก
                                 </NavLink>
                                 <NavLink
-                                    :href="route('schedules.create')"
-                                    :active="route().current('schedules.create')"
+                                    :href="route('schedules.index')"
+                                    :active="route().current('schedules.index')"
                                 >
-                                    สร้างตารางสอน
+                                    ตารางสอน (Schedules)
                                 </NavLink>
                                 <NavLink
                                     :href="route('course-offerings.index')"
@@ -165,10 +165,10 @@ const showingNavigationDropdown = ref(false);
                             หน้าหลัก
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            :href="route('schedules.create')"
-                            :active="route().current('schedules.create')"
+                            :href="route('schedules.index')"
+                            :active="route().current('schedules.index')"
                         >
-                            สร้างตารางสอน
+                            ตารางสอน (Schedules)
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             :href="route('course-offerings.index')"
