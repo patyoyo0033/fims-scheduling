@@ -47,104 +47,120 @@ const orb3 = computed(() => calcOrb(55))
 <template>
     <Head title="เข้าสู่ระบบ — ระบบจัดตารางสอน FIMS" />
 
-    <!-- ── Full-screen wrapper ──────────────────────────────────────────────── -->
-    <div class="relative min-h-screen flex overflow-hidden bg-nursing-50 font-sans">
+    <div class="relative min-h-screen flex overflow-hidden bg-gradient-to-br from-nursing-50 via-white to-blue-50/30 font-sans">
 
         <!-- ── Parallax Background Orbs ─────────────────────────────────────── -->
         <div class="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
             <div
-                class="absolute w-[600px] h-[600px] rounded-full opacity-[0.13] blur-[120px] bg-nursing-600"
-                :style="{ top: '5%', left: '5%', transform: `translate(${orb1.x}px,${orb1.y}px)`, transition: 'transform 0.8s cubic-bezier(.23,1,.32,1)' }"
+                class="absolute w-[700px] h-[700px] rounded-full opacity-[0.10] blur-[140px] bg-nursing-500"
+                :style="{ top: '-10%', left: '-5%', transform: `translate(${orb1.x}px,${orb1.y}px)`, transition: 'transform 0.8s cubic-bezier(.23,1,.32,1)' }"
             />
             <div
-                class="absolute w-[450px] h-[450px] rounded-full opacity-[0.18] blur-[90px] bg-nursing-300"
-                :style="{ bottom: '5%', right: '5%', transform: `translate(${orb2.x}px,${orb2.y}px)`, transition: 'transform 1s cubic-bezier(.23,1,.32,1)' }"
+                class="absolute w-[500px] h-[500px] rounded-full opacity-[0.12] blur-[100px] bg-nursing-300"
+                :style="{ bottom: '-5%', right: '10%', transform: `translate(${orb2.x}px,${orb2.y}px)`, transition: 'transform 1s cubic-bezier(.23,1,.32,1)' }"
             />
             <div
-                class="absolute w-[280px] h-[280px] rounded-full opacity-[0.10] blur-[70px] bg-blue-400"
-                :style="{ top: '50%', left: '50%', transform: `translate(${orb3.x}px,${orb3.y}px)`, transition: 'transform 1.2s cubic-bezier(.23,1,.32,1)' }"
+                class="absolute w-[350px] h-[350px] rounded-full opacity-[0.08] blur-[80px] bg-blue-400"
+                :style="{ top: '40%', left: '45%', transform: `translate(${orb3.x}px,${orb3.y}px)`, transition: 'transform 1.2s cubic-bezier(.23,1,.32,1)' }"
             />
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <!-- LEFT PANEL — Branding & Features                                   -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <div class="relative z-10 hidden lg:flex flex-col justify-between w-1/2 xl:w-3/5 px-16 py-14">
+        <div class="relative z-10 hidden lg:flex flex-col w-[55%] xl:w-[58%] px-12 xl:px-20 py-10">
 
-            <!-- Logo + Name -->
-            <div class="flex items-center gap-4">
-                <img src="/logo_mu.png" alt="MU Logo" class="h-14 w-auto drop-shadow-sm" />
+            <!-- Top: Logo + Institution -->
+            <div class="flex items-center gap-5">
+                <div class="flex-shrink-0 p-2 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm">
+                    <img src="/logo_mu.png" alt="MU Logo" class="h-16 xl:h-20 w-auto" />
+                </div>
                 <div>
-                    <h1 class="text-xl font-bold text-nursing-900 leading-tight">คณะพยาบาลศาสตร์</h1>
-                    <p class="text-sm text-nursing-600/70">มหาวิทยาลัยมหิดล</p>
+                    <h1 class="text-2xl xl:text-[1.7rem] font-bold text-nursing-900 leading-snug">
+                        คณะพยาบาลศาสตร์
+                    </h1>
+                    <p class="text-base xl:text-lg text-nursing-600/80 font-medium mt-0.5">
+                        มหาวิทยาลัยมหิดล
+                    </p>
                 </div>
             </div>
 
-            <!-- Hero text -->
-            <div class="flex-1 flex flex-col justify-center max-w-xl">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-nursing-100 border border-nursing-200 text-xs font-semibold text-nursing-700 mb-6 w-fit">
-                    <span class="w-1.5 h-1.5 rounded-full bg-nursing-500 animate-pulse"></span>
-                    FIMS — Faculty Information Management System
+            <!-- Center: Hero Content -->
+            <div class="flex-1 flex flex-col justify-center max-w-lg mt-6">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-nursing-100/80 border border-nursing-200/60 text-xs font-semibold text-nursing-700 mb-8 w-fit">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    ระบบพร้อมใช้งาน
                 </div>
 
-                <h2 class="text-4xl xl:text-5xl font-extrabold text-nursing-950 leading-[1.15] tracking-tight">
-                    ระบบจัดการ<br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-nursing-600 to-blue-600">ตารางสอน</span><br/>
-                    อัจฉริยะ
+                <h2 class="text-[2.5rem] xl:text-5xl font-extrabold text-nursing-950 leading-[1.1] tracking-tight">
+                    ระบบจัดการ
+                    <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-nursing-600 via-nursing-500 to-blue-500">
+                        ตารางสอน
+                    </span>
                 </h2>
-                <p class="mt-5 text-base text-nursing-700/70 leading-relaxed max-w-sm">
-                    บริหารตารางการสอน ตรวจสอบห้องและอาจารย์ซ้อนทับโดยอัตโนมัติ รองรับทุกบทบาทในคณะ
+
+                <p class="mt-5 text-[0.95rem] text-nursing-700/65 leading-relaxed max-w-md">
+                    บริหารจัดการตารางสอนทั้งคณะอย่างมีประสิทธิภาพ ตรวจสอบห้องเรียนและอาจารย์ซ้อนทับโดยอัตโนมัติ พร้อมรองรับทุกบทบาทในระบบ
                 </p>
 
-                <!-- Feature pills -->
-                <div class="mt-10 grid grid-cols-2 gap-3">
+                <!-- Feature Cards -->
+                <div class="mt-10 space-y-3">
                     <div
-                        v-for="feat in [
-                            { icon: '🏫', label: 'จัดห้องเรียนอัตโนมัติ' },
-                            { icon: '⚡', label: 'ตรวจสอบ Conflict ทันที' },
-                            { icon: '📅', label: 'มุมมองปฏิทินรายสัปดาห์' },
-                            { icon: '🔐', label: 'รองรับทุก Role ในระบบ' },
+                        v-for="(feat, i) in [
+                            { icon: '🏫', title: 'จัดห้องเรียนอัตโนมัติ', desc: 'ตรวจสอบความจุก่อนจัดสรร' },
+                            { icon: '⚡', title: 'ตรวจสอบ Conflict ทันที', desc: 'ป้องกันตารางซ้อนทับ 100%' },
+                            { icon: '📅', title: 'มุมมองปฏิทินรายสัปดาห์', desc: 'ดูตารางแบบ Calendar View' },
                         ]"
-                        :key="feat.label"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm"
+                        :key="feat.title"
+                        class="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/70 shadow-sm hover:bg-white/70 hover:shadow-md transition-all duration-300 group"
                     >
-                        <span class="text-xl">{{ feat.icon }}</span>
-                        <span class="text-sm font-medium text-nursing-800">{{ feat.label }}</span>
+                        <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-nursing-100/80 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+                            {{ feat.icon }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-nursing-900">{{ feat.title }}</p>
+                            <p class="text-xs text-nursing-600/60 mt-0.5">{{ feat.desc }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer note -->
-            <p class="text-xs text-nursing-500/60">
-                © {{ new Date().getFullYear() }} Faculty of Nursing — Mahidol University
+            <!-- Bottom: Footer -->
+            <p class="text-xs text-nursing-400/60">
+                © {{ new Date().getFullYear() }} Faculty of Nursing, Mahidol University — FIMS v1.0
             </p>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <!-- RIGHT PANEL — Login Form                                           -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <div class="relative z-10 flex flex-col items-center justify-center w-full lg:w-1/2 xl:w-2/5 px-6 py-14">
+        <div class="relative z-10 flex flex-col items-center justify-center w-full lg:w-[45%] xl:w-[42%] px-6 sm:px-8 py-10">
 
-            <!-- Mobile only: Logo -->
-            <div class="lg:hidden text-center mb-8">
-                <img src="/logo_mu.png" alt="MU Logo" class="mx-auto h-20 w-auto drop-shadow-sm" />
-                <h1 class="mt-4 text-2xl font-bold text-nursing-900">คณะพยาบาลศาสตร์</h1>
-                <p class="mt-1 text-sm text-nursing-600/80">ระบบจัดตารางสอน (FIMS)</p>
+            <!-- Mobile only: Logo + Branding -->
+            <div class="lg:hidden text-center mb-10">
+                <div class="inline-block p-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm mb-4">
+                    <img src="/logo_mu.png" alt="MU Logo" class="h-20 w-auto" />
+                </div>
+                <h1 class="text-2xl font-bold text-nursing-900">คณะพยาบาลศาสตร์</h1>
+                <p class="text-sm text-nursing-600/70 mt-1">มหาวิทยาลัยมหิดล</p>
+                <p class="text-xs text-nursing-500/60 mt-0.5">ระบบจัดตารางสอน (FIMS)</p>
             </div>
 
             <!-- Glass Card with Tilt -->
-            <div class="w-full max-w-md">
+            <div class="w-full max-w-[26rem]">
                 <TiltCard :max-tilt="1.5" :scale="1.01">
-                    <div class="bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-glass p-8">
+                    <div class="bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-[0_8px_40px_rgba(0,0,0,0.06)] p-7 sm:p-8">
 
                         <!-- Card heading -->
-                        <div class="mb-7">
+                        <div class="mb-6">
                             <h2 class="text-xl font-bold text-nursing-900">เข้าสู่ระบบ</h2>
-                            <p class="text-sm text-nursing-600/70 mt-1">ยินดีต้อนรับกลับมา</p>
+                            <p class="text-sm text-nursing-600/60 mt-1">ยินดีต้อนรับกลับมา</p>
                         </div>
 
                         <!-- Status message -->
-                        <div v-if="status" class="mb-4 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-medium text-emerald-700">
+                        <div v-if="status" class="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-medium text-emerald-700">
                             {{ status }}
                         </div>
 
@@ -159,17 +175,17 @@ const orb3 = computed(() => calcOrb(55))
                         </MagneticButton>
 
                         <!-- ── Divider ──────────────────────────────── -->
-                        <div class="relative my-7">
+                        <div class="relative my-6">
                             <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-nursing-200/60" />
+                                <div class="w-full border-t border-nursing-200/50" />
                             </div>
                             <div class="relative flex justify-center">
-                                <span class="bg-white/70 backdrop-blur-sm px-4 text-xs font-medium text-nursing-600/60 uppercase tracking-wider">หรือ</span>
+                                <span class="bg-white/70 backdrop-blur-sm px-4 text-xs font-medium text-nursing-500/50 uppercase tracking-wider">หรือ</span>
                             </div>
                         </div>
 
                         <!-- ── Login Form ──────────────────────────── -->
-                        <form @submit.prevent="submit" class="space-y-5">
+                        <form @submit.prevent="submit" class="space-y-4">
                             <!-- Email -->
                             <div>
                                 <label for="email" class="block text-sm font-semibold text-nursing-900 mb-1.5">อีเมล</label>
@@ -232,9 +248,9 @@ const orb3 = computed(() => calcOrb(55))
                             </div>
 
                             <!-- Submit -->
-                            <MagneticButton tag="div" class="block w-full">
+                            <MagneticButton tag="div" class="block w-full pt-1">
                                 <button type="submit" :disabled="form.processing"
-                                    class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-nursing-900 hover:bg-nursing-800 active:bg-nursing-900 shadow-md shadow-nursing-900/15 hover:shadow-lg hover:shadow-nursing-900/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-nursing-900 hover:bg-nursing-800 active:bg-nursing-950 shadow-md shadow-nursing-900/15 hover:shadow-lg hover:shadow-nursing-900/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                                     <svg v-if="form.processing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
@@ -247,7 +263,7 @@ const orb3 = computed(() => calcOrb(55))
                     </div>
                 </TiltCard>
 
-                <p class="mt-6 text-center text-xs text-nursing-600/50">
+                <p class="mt-6 text-center text-xs text-nursing-500/40">
                     © {{ new Date().getFullYear() }} Faculty of Nursing Information Management System
                 </p>
             </div>
