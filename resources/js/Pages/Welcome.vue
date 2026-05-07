@@ -47,7 +47,7 @@ const orb3 = computed(() => calcOrb(55))
 <template>
     <Head title="เข้าสู่ระบบ — ระบบจัดตารางสอน FIMS" />
 
-    <div class="relative min-h-screen flex overflow-hidden bg-gradient-to-br from-nursing-50 via-white to-blue-50/30 font-sans">
+    <div class="relative h-screen flex overflow-hidden bg-gradient-to-br from-nursing-50 via-white to-blue-50/30 font-sans">
 
         <!-- ── Parallax Background Orbs ─────────────────────────────────────── -->
         <div class="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
@@ -66,87 +66,86 @@ const orb3 = computed(() => calcOrb(55))
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <!-- LEFT PANEL — Branding & Features                                   -->
+        <!-- CONTENT WRAPPER                                                    -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <div class="relative z-10 hidden lg:flex flex-col w-[55%] xl:w-[58%] px-12 xl:px-20 py-10">
+        <div class="relative z-10 w-full max-w-[1150px] mx-auto flex h-full px-8 lg:px-12">
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- LEFT PANEL — Branding & Features                                   -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <div class="hidden lg:flex flex-col justify-between w-1/2 pr-8 xl:pr-12 py-12">
 
-            <!-- Top: Logo + Institution -->
-            <div class="flex items-center gap-5">
-                <div class="flex-shrink-0 p-2 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm">
-                    <img src="/logo_mu.png" alt="MU Logo" class="h-16 xl:h-20 w-auto" />
+                <!-- Top: Logo + Institution -->
+                <div class="flex items-center gap-5">
+                    <img src="/logo_mu.png" alt="MU Logo" class="h-16 xl:h-18 w-auto flex-shrink-0" />
+                    <div>
+                        <h1 class="text-2xl xl:text-3xl font-bold text-nursing-900 leading-snug">
+                            คณะพยาบาลศาสตร์
+                        </h1>
+                        <p class="text-base xl:text-lg text-nursing-600/80 font-medium mt-0.5">
+                            มหาวิทยาลัยมหิดล
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-2xl xl:text-[1.7rem] font-bold text-nursing-900 leading-snug">
-                        คณะพยาบาลศาสตร์
-                    </h1>
-                    <p class="text-base xl:text-lg text-nursing-600/80 font-medium mt-0.5">
-                        มหาวิทยาลัยมหิดล
+
+                <!-- Center: Hero Content -->
+                <div class="flex-1 flex flex-col justify-center max-w-lg mt-6">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-nursing-100/80 border border-nursing-200/60 text-xs font-semibold text-nursing-700 mb-8 w-fit">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        ระบบพร้อมใช้งาน
+                    </div>
+
+                    <h2 class="text-[2.5rem] xl:text-[3rem] font-extrabold text-nursing-950 leading-[1.1] tracking-tight">
+                        ระบบจัดการ<span class="text-transparent bg-clip-text bg-gradient-to-r from-nursing-600 via-nursing-500 to-blue-500">ตารางสอน</span>
+                    </h2>
+
+                    <p class="mt-5 text-[0.95rem] text-nursing-700/65 leading-relaxed max-w-md">
+                        บริหารจัดการตารางสอนทั้งคณะอย่างมีประสิทธิภาพ ตรวจสอบห้องเรียนและอาจารย์ซ้อนทับโดยอัตโนมัติ พร้อมรองรับทุกบทบาทในระบบ
                     </p>
-                </div>
-            </div>
 
-            <!-- Center: Hero Content -->
-            <div class="flex-1 flex flex-col justify-center max-w-lg mt-6">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-nursing-100/80 border border-nursing-200/60 text-xs font-semibold text-nursing-700 mb-8 w-fit">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    ระบบพร้อมใช้งาน
-                </div>
-
-                <h2 class="text-[2.5rem] xl:text-5xl font-extrabold text-nursing-950 leading-[1.1] tracking-tight">
-                    ระบบจัดการ
-                    <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-nursing-600 via-nursing-500 to-blue-500">
-                        ตารางสอน
-                    </span>
-                </h2>
-
-                <p class="mt-5 text-[0.95rem] text-nursing-700/65 leading-relaxed max-w-md">
-                    บริหารจัดการตารางสอนทั้งคณะอย่างมีประสิทธิภาพ ตรวจสอบห้องเรียนและอาจารย์ซ้อนทับโดยอัตโนมัติ พร้อมรองรับทุกบทบาทในระบบ
-                </p>
-
-                <!-- Feature Cards -->
-                <div class="mt-10 space-y-3">
-                    <div
-                        v-for="(feat, i) in [
-                            { icon: '🏫', title: 'จัดห้องเรียนอัตโนมัติ', desc: 'ตรวจสอบความจุก่อนจัดสรร' },
-                            { icon: '⚡', title: 'ตรวจสอบ Conflict ทันที', desc: 'ป้องกันตารางซ้อนทับ 100%' },
-                            { icon: '📅', title: 'มุมมองปฏิทินรายสัปดาห์', desc: 'ดูตารางแบบ Calendar View' },
-                        ]"
-                        :key="feat.title"
-                        class="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/70 shadow-sm hover:bg-white/70 hover:shadow-md transition-all duration-300 group"
-                    >
-                        <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-nursing-100/80 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
-                            {{ feat.icon }}
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-nursing-900">{{ feat.title }}</p>
-                            <p class="text-xs text-nursing-600/60 mt-0.5">{{ feat.desc }}</p>
+                    <!-- Feature Cards -->
+                    <div class="mt-10 space-y-3">
+                        <div
+                            v-for="(feat, i) in [
+                                { icon: '🏫', title: 'จัดห้องเรียนอัตโนมัติ', desc: 'ตรวจสอบความจุก่อนจัดสรร' },
+                                { icon: '⚡', title: 'ตรวจสอบ Conflict ทันที', desc: 'ป้องกันตารางซ้อนทับ 100%' },
+                                { icon: '📅', title: 'มุมมองปฏิทินรายสัปดาห์', desc: 'ดูตารางแบบ Calendar View' },
+                            ]"
+                            :key="feat.title"
+                            class="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/70 shadow-sm hover:bg-white/70 hover:shadow-md transition-all duration-300 group"
+                        >
+                            <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-nursing-100/80 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+                                {{ feat.icon }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-nursing-900">{{ feat.title }}</p>
+                                <p class="text-xs text-nursing-600/60 mt-0.5">{{ feat.desc }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Bottom: Footer -->
+                <p class="text-xs text-nursing-400/60">
+                    © {{ new Date().getFullYear() }} Faculty of Nursing, Mahidol University — FIMS v1.0
+                </p>
             </div>
 
-            <!-- Bottom: Footer -->
-            <p class="text-xs text-nursing-400/60">
-                © {{ new Date().getFullYear() }} Faculty of Nursing, Mahidol University — FIMS v1.0
-            </p>
-        </div>
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- RIGHT PANEL — Login Form                                           -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <div class="flex flex-col items-center justify-center w-full lg:w-1/2 pl-8 xl:pl-12 py-12">
 
-        <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <!-- RIGHT PANEL — Login Form                                           -->
-        <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <div class="relative z-10 flex flex-col items-center justify-center w-full lg:w-[45%] xl:w-[42%] px-6 sm:px-8 py-10">
-
-            <!-- Mobile only: Logo + Branding -->
-            <div class="lg:hidden text-center mb-10">
-                <div class="inline-block p-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/80 shadow-sm mb-4">
-                    <img src="/logo_mu.png" alt="MU Logo" class="h-20 w-auto" />
+                <!-- Mobile only: Logo + Branding -->
+                <div class="lg:hidden text-center mb-10">
+                    <div class="mb-4">
+                        <img src="/logo_mu.png" alt="MU Logo" class="mx-auto h-20 w-auto" />
+                    </div>
+                    <h1 class="text-2xl font-bold text-nursing-900">คณะพยาบาลศาสตร์</h1>
+                    <p class="text-sm text-nursing-600/70 mt-1">มหาวิทยาลัยมหิดล</p>
+                    <p class="text-xs text-nursing-500/60 mt-0.5">ระบบจัดตารางสอน (FIMS)</p>
                 </div>
-                <h1 class="text-2xl font-bold text-nursing-900">คณะพยาบาลศาสตร์</h1>
-                <p class="text-sm text-nursing-600/70 mt-1">มหาวิทยาลัยมหิดล</p>
-                <p class="text-xs text-nursing-500/60 mt-0.5">ระบบจัดตารางสอน (FIMS)</p>
-            </div>
 
             <!-- Glass Card with Tilt -->
             <div class="w-full max-w-[26rem]">
