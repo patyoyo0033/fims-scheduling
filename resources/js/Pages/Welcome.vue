@@ -267,6 +267,8 @@ const orb3 = computed(() => calcOrb(55))
                 </p>
             </div>
         </div>
+        <!-- End of CONTENT WRAPPER -->
+        </div>
 
     </div>
 </template>
