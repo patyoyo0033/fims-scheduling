@@ -11,6 +11,7 @@ const props = defineProps({
     teachers: Array,
     rooms: Array,
     groups: Array,
+    activities: Array,
 });
 
 const showFormModal = ref(false);
@@ -85,10 +86,10 @@ const formatDate = (dateStr) => {
                                 <tr v-for="sched in schedules" :key="sched.id" class="hover:bg-nursing-50/30 transition-colors">
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ formatDate(sched.teaching_date) }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.start_time.substring(0,5) }} - {{ sched.end_time.substring(0,5) }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-nursing-700 font-semibold">{{ sched.course?.course_code }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.student_group }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-nursing-700 font-semibold">{{ sched.course_offering?.course?.course_code }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.student_groups.map(g => g.group_name).join(', ') }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.room?.room_code }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.user?.name }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ sched.instructors.map(i => i.name).join(', ') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -104,6 +105,7 @@ const formatDate = (dateStr) => {
             :teachers="teachers"
             :rooms="rooms"
             :groups="groups"
+            :activities="activities"
             @close="closeForm" 
         />
     </AuthenticatedLayout>

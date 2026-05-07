@@ -7,8 +7,10 @@ use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\StudentGroup;
 use App\Models\User;
+use App\Models\ActivityType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ScheduleController extends Controller
@@ -18,16 +20,17 @@ class ScheduleController extends Controller
      */
     public function index()
     {
-        $schedules = Schedule::with(['course', 'user', 'room'])
+        $schedules = Schedule::with(['courseOffering.course', 'instructors', 'room', 'studentGroups'])
             ->orderBy('teaching_date', 'desc')
             ->get();
 
         return Inertia::render('Schedules/Index', [
-            'schedules' => $schedules,
-            'offerings' => CourseOffering::with(['course', 'academicYear'])->get(),
-            'teachers'  => User::orderBy('name')->get(),
-            'rooms'     => Room::where('is_active', true)->get(),
-            'groups'    => StudentGroup::with('academicYear')->get(),
+            'schedules'  => $schedules,
+            'offerings'  => CourseOffering::with(['course', 'academicYear'])->get(),
+            'teachers'   => User::orderBy('name')->get(),
+            'rooms'      => Room::where('is_active', true)->get(),
+            'groups'     => StudentGroup::with('academicYear')->get(),
+            'activities' => ActivityType::all(),
         ]);
     }
 
@@ -38,6 +41,7 @@ class ScheduleController extends Controller
     {
         $validated = $request->validate([
             'course_offering_id' => 'required|exists:course_offerings,id',
+            'activity_type_id'   => 'required|exists:activity_types,id',
             'user_id'            => 'required|exists:users,id',
             'teaching_date'      => 'required|date',
             'start_time'         => 'required|date_format:H:i',
@@ -52,10 +56,6 @@ class ScheduleController extends Controller
             'rotations.*.student_group_id' => 'exclude_if:is_rotation,false|required|exists:student_groups,id',
         ]);
 
-        $offering = CourseOffering::findOrFail($request->course_offering_id);
-        $courseId = $offering->course_id;
-
-        // Calculate dates for recurring schedules
         $dates = [];
         $currentDate = Carbon::parse($request->teaching_date);
         $weeks = $request->is_recurring ? $request->repeat_weeks : 1;
@@ -64,56 +64,39 @@ class ScheduleController extends Controller
             $dates[] = $currentDate->copy()->addWeeks($i)->format('Y-m-d');
         }
 
-        $inserts = [];
-
-        // Logic for building the insert array
-        if ($request->is_rotation) {
-            // Rotation Logic: Iterate through dates and rotations
-            foreach ($dates as $dateStr) {
-                foreach ($request->rotations as $rotation) {
-                    $group = StudentGroup::find($rotation['student_group_id']);
-                    $inserts[] = [
-                        'course_id'     => $courseId,
-                        'user_id'       => $request->user_id,
-                        'room_id'       => $rotation['room_id'],
-                        'student_group' => $group->group_name,
-                        'student_count' => $group->student_count,
-                        'teaching_date' => $dateStr,
-                        'start_time'    => $request->start_time,
-                        'end_time'      => $request->end_time,
-                        'status'        => 'draft',
-                        'created_at'    => now(),
-                        'updated_at'    => now(),
-                    ];
+        DB::transaction(function () use ($request, $dates) {
+            if ($request->is_rotation) {
+                foreach ($dates as $dateStr) {
+                    foreach ($request->rotations as $rotation) {
+                        $schedule = Schedule::create([
+                            'course_offering_id' => $request->course_offering_id,
+                            'activity_type_id'   => $request->activity_type_id,
+                            'room_id'            => $rotation['room_id'],
+                            'teaching_date'      => $dateStr,
+                            'start_time'         => $request->start_time,
+                            'end_time'           => $request->end_time,
+                            'status'             => 'draft',
+                        ]);
+                        $schedule->instructors()->attach($request->user_id, ['is_lead' => true]);
+                        $schedule->studentGroups()->attach($rotation['student_group_id']);
+                    }
+                }
+            } else {
+                foreach ($dates as $dateStr) {
+                    $schedule = Schedule::create([
+                        'course_offering_id' => $request->course_offering_id,
+                        'activity_type_id'   => $request->activity_type_id,
+                        'room_id'            => $request->room_id,
+                        'teaching_date'      => $dateStr,
+                        'start_time'         => $request->start_time,
+                        'end_time'           => $request->end_time,
+                        'status'             => 'draft',
+                    ]);
+                    $schedule->instructors()->attach($request->user_id, ['is_lead' => true]);
+                    $schedule->studentGroups()->attach($request->student_group_id);
                 }
             }
-        } else {
-            // Standard Logic
-            $group = StudentGroup::find($request->student_group_id);
-            foreach ($dates as $dateStr) {
-                $inserts[] = [
-                    'course_id'     => $courseId,
-                    'user_id'       => $request->user_id,
-                    'room_id'       => $request->room_id,
-                    'student_group' => $group->group_name,
-                    'student_count' => $group->student_count,
-                    'teaching_date' => $dateStr,
-                    'start_time'    => $request->start_time,
-                    'end_time'      => $request->end_time,
-                    'status'        => 'draft',
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
-                ];
-            }
-        }
-
-        /* 
-         * MOCK CONFLICT CHECK:
-         * We skip the complex conflict checking (overlapping times/rooms) for now 
-         * to focus purely on making the Recurring and Rotation insertion logic robust and bug-free.
-         */
-
-        Schedule::insert($inserts);
+        });
 
         return redirect()->back()->with('success', 'บันทึกตารางสอนสำเร็จแล้ว');
     }
