@@ -74,7 +74,7 @@ const submit = () => {
 
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Base Info -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="space-y-4">
                     <div>
                         <InputLabel for="course_offering_id" value="รายวิชา (Course Offering)" />
                         <select id="course_offering_id" v-model="form.course_offering_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30">
@@ -86,26 +86,28 @@ const submit = () => {
                         <InputError class="mt-2" :message="form.errors.course_offering_id" />
                     </div>
 
-                    <div>
-                        <InputLabel for="user_id" value="อาจารย์ผู้สอนหลัก (Lead Teacher)" />
-                        <select id="user_id" v-model="form.user_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30">
-                            <option value="" disabled>-- เลือกอาจารย์ --</option>
-                            <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
-                                {{ teacher.name }}
-                            </option>
-                        </select>
-                        <InputError class="mt-2" :message="form.errors.user_id" />
-                    </div>
-                    
-                    <div>
-                        <InputLabel for="activity_type_id" value="ประเภทการสอน (Activity Type)" />
-                        <select id="activity_type_id" v-model="form.activity_type_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30">
-                            <option value="" disabled>-- เลือกประเภท --</option>
-                            <option v-for="act in activities" :key="act.id" :value="act.id">
-                                {{ act.name }}
-                            </option>
-                        </select>
-                        <InputError class="mt-2" :message="form.errors.activity_type_id" />
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <InputLabel for="user_id" value="อาจารย์ผู้สอนหลัก (Lead Teacher)" />
+                            <select id="user_id" v-model="form.user_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30">
+                                <option value="" disabled>-- เลือกอาจารย์ --</option>
+                                <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
+                                    {{ teacher.name }}
+                                </option>
+                            </select>
+                            <InputError class="mt-2" :message="form.errors.user_id" />
+                        </div>
+                        
+                        <div>
+                            <InputLabel for="activity_type_id" value="ประเภทการสอน (Activity Type)" />
+                            <select id="activity_type_id" v-model="form.activity_type_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30">
+                                <option value="" disabled>-- เลือกประเภท --</option>
+                                <option v-for="act in activities" :key="act.id" :value="act.id">
+                                    {{ act.name }}
+                                </option>
+                            </select>
+                            <InputError class="mt-2" :message="form.errors.activity_type_id" />
+                        </div>
                     </div>
                 </div>
 

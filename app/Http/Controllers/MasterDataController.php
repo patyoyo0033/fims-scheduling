@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use App\Models\Room;
 use App\Models\StudentGroup;
+use App\Models\LocationType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,9 +17,10 @@ class MasterDataController extends Controller
     public function index()
     {
         return Inertia::render('MasterData/Index', [
-            'rooms' => Room::latest()->get(),
+            'rooms' => Room::with('locationType')->latest()->get(),
             'studentGroups' => StudentGroup::with('academicYear')->latest()->get(),
             'academicYears' => AcademicYear::latest()->get(),
+            'locationTypes' => LocationType::all(),
         ]);
     }
 
@@ -30,7 +32,7 @@ class MasterDataController extends Controller
             'room_code' => 'required|string|max:255|unique:rooms',
             'room_name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'location_type' => 'required|string|max:255',
+            'location_type_id' => 'required|exists:location_types,id',
             'is_active' => 'boolean',
         ]);
 
@@ -45,7 +47,7 @@ class MasterDataController extends Controller
             'room_code' => 'required|string|max:255|unique:rooms,room_code,' . $room->id,
             'room_name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'location_type' => 'required|string|max:255',
+            'location_type_id' => 'required|exists:location_types,id',
             'is_active' => 'boolean',
         ]);
 

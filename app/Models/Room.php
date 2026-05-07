@@ -10,7 +10,8 @@ class Room extends Model
         'room_code',
         'room_name',
         'capacity',
-        'location_type',
+        'location_type_id',
+        'equipment_type',
         'is_active',
     ];
 
@@ -19,11 +20,17 @@ class Room extends Model
         return [
             'is_active' => 'boolean',
             'capacity' => 'integer',
+            'equipment_type' => 'array',
         ];
     }
 
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function locationType()
+    {
+        return $this->belongsTo(LocationType::class);
     }
 }
