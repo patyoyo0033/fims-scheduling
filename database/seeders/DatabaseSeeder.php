@@ -10,8 +10,10 @@ use App\Models\StudentGroup;
 use App\Models\User;
 use App\Models\Curriculum;
 use App\Models\LocationType;
+use App\Models\ActivityType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -152,25 +154,42 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // 5.5 Activity Types
+        ActivityType::firstOrCreate(
+            ['name' => 'Lecture'],
+            ['is_practicum' => false, 'settings' => null]
+        );
+        ActivityType::firstOrCreate(
+            ['name' => 'Lab'],
+            ['is_practicum' => true, 'settings' => ['max_students_per_group' => 8]]
+        );
+        ActivityType::firstOrCreate(
+            ['name' => 'Ward'],
+            ['is_practicum' => true, 'settings' => ['max_students_per_group' => 6]]
+        );
+
         // 6. Course Offerings
-        CourseOffering::firstOrCreate(
+        $offering1 = CourseOffering::firstOrCreate(
             ['course_id' => $course1->id, 'academic_year_id' => $academicYear->id],
             [
                 'coordinator_id' => $teacher1->id,
-                'is_practicum' => false,
-                'settings' => null,
+                'approval_status' => 'published',
             ]
         );
 
-        CourseOffering::firstOrCreate(
+        $offering2 = CourseOffering::firstOrCreate(
             ['course_id' => $course2->id, 'academic_year_id' => $academicYear->id],
             [
                 'coordinator_id' => $teacher2->id,
-                'is_practicum' => true,
-                'settings' => [
-                    'max_students_per_group' => 8,
-                ],
+                'approval_status' => 'published',
             ]
         );
+        
+        // 7. Course Offering Instructors (M:N)
+        DB::table('course_offering_instructors')->insertOrIgnore([
+            ['course_offering_id' => $offering1->id, 'user_id' => $teacher1->id],
+            ['course_offering_id' => $offering2->id, 'user_id' => $teacher2->id],
+            ['course_offering_id' => $offering2->id, 'user_id' => $teacher1->id], // Teacher 1 also teaches course 2
+        ]);
     }
 }
