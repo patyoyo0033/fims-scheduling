@@ -19,11 +19,59 @@ class ScheduleController extends Controller
     /**
      * Display a listing of schedules.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $schedules = Schedule::with(['courseOffering.course', 'instructors', 'room', 'studentGroups'])
-            ->orderBy('teaching_date', 'desc')
-            ->get();
+        $query = Schedule::with([
+            'courseOffering.course',
+            'courseOffering.academicYear',
+            'instructors',
+            'room',
+            'studentGroups',
+            'activityType',
+        ]);
+
+        // Full-text search: match course name/code, teacher name, room code
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->whereHas('courseOffering.course', function ($c) use ($term) {
+                    $c->where('course_name', 'like', "%{$term}%")
+                      ->orWhere('course_code', 'like', "%{$term}%");
+                })
+                ->orWhereHas('instructors', function ($u) use ($term) {
+                    $u->where('name', 'like', "%{$term}%");
+                })
+                ->orWhereHas('room', function ($r) use ($term) {
+                    $r->where('room_code', 'like', "%{$term}%")
+                      ->orWhere('room_name', 'like', "%{$term}%");
+                });
+            });
+        }
+
+        // Filter by specific room
+        if ($request->filled('room_id')) {
+            $query->where('room_id', $request->room_id);
+        }
+
+        // Filter by specific teacher
+        if ($request->filled('user_id')) {
+            $query->whereHas('instructors', fn($u) => $u->where('users.id', $request->user_id));
+        }
+
+        // Filter by course offering
+        if ($request->filled('offering_id')) {
+            $query->where('course_offering_id', $request->offering_id);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->where('teaching_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('teaching_date', '<=', $request->date_to);
+        }
+
+        $schedules = $query->orderBy('teaching_date', 'desc')->get();
 
         return Inertia::render('Schedules/Index', [
             'schedules'  => $schedules,
@@ -32,6 +80,8 @@ class ScheduleController extends Controller
             'rooms'      => Room::where('is_active', true)->get(),
             'groups'     => StudentGroup::with('academicYear')->get(),
             'activities' => ActivityType::all(),
+            // Pass current filters back so Vue can restore state
+            'filters'    => $request->only(['search', 'room_id', 'user_id', 'offering_id', 'date_from', 'date_to']),
         ]);
     }
 

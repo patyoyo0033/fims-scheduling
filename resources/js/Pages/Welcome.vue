@@ -68,7 +68,7 @@ const orb3 = computed(() => calcOrb(55))
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <!-- CONTENT WRAPPER                                                    -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <div class="relative z-10 w-full max-w-[1150px] mx-auto flex h-full px-8 lg:px-12">
+        <div class="relative z-10 w-full max-w-[1300px] mx-auto flex h-full px-8 lg:px-12">
             
             <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- LEFT PANEL — Branding & Features                                   -->

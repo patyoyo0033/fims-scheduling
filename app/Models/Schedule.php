@@ -22,7 +22,7 @@ class Schedule extends Model
     protected function casts(): array
     {
         return [
-            'teaching_date' => 'date',
+            'teaching_date' => 'string',
         ];
     }
 
