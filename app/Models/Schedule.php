@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     protected $fillable = [
-        'course_id',
-        'user_id',
+        'course_offering_id',
+        'activity_type_id',
+        'practicum_series_id',
         'room_id',
-        'student_group',
-        'student_count',
+        'topic',
+        'remark',
         'teaching_date',
         'start_time',
         'end_time',
@@ -21,22 +22,37 @@ class Schedule extends Model
     protected function casts(): array
     {
         return [
-            'teaching_date' => 'date',
+            'teaching_date' => 'string',
         ];
     }
 
-    public function course()
+    public function courseOffering()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(CourseOffering::class);
     }
 
-    public function user()
+    public function activityType()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(ActivityType::class);
+    }
+
+    public function practicumSeries()
+    {
+        return $this->belongsTo(PracticumSeries::class);
     }
 
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function instructors()
+    {
+        return $this->belongsToMany(User::class, 'schedule_instructors')->withPivot('is_lead')->withTimestamps();
+    }
+
+    public function studentGroups()
+    {
+        return $this->belongsToMany(StudentGroup::class, 'schedule_student_groups')->withTimestamps();
     }
 }

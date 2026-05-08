@@ -14,6 +14,7 @@ const props = defineProps({
     rooms: Array,
     studentGroups: Array,
     academicYears: Array,
+    locationTypes: Array,
 });
 
 const activeTab = ref('rooms'); // 'rooms' or 'groups'
@@ -27,7 +28,7 @@ const roomForm = useForm({
     room_code: '',
     room_name: '',
     capacity: 30,
-    location_type: 'Lecture',
+    location_type_id: props.locationTypes.length > 0 ? props.locationTypes[0].id : '',
     is_active: true,
 });
 
@@ -39,12 +40,15 @@ const openRoomModal = (room = null) => {
         roomForm.room_code = room.room_code;
         roomForm.room_name = room.room_name;
         roomForm.capacity = room.capacity;
-        roomForm.location_type = room.location_type;
+        roomForm.location_type_id = room.location_type_id;
         roomForm.is_active = !!room.is_active;
     } else {
         isEditingRoom.value = false;
         currentRoomId.value = null;
         roomForm.reset();
+        if (props.locationTypes.length > 0) {
+            roomForm.location_type_id = props.locationTypes[0].id;
+        }
     }
     showRoomModal.value = true;
 };
@@ -215,7 +219,7 @@ const deleteGroup = (id) => {
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ room.room_code }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ room.room_name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ room.capacity }} คน</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ room.location_type }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ room.location_type?.type_name || 'ไม่ได้ระบุ' }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span :class="room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                                                     {{ room.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
@@ -313,14 +317,14 @@ const deleteGroup = (id) => {
                             <InputError class="mt-2" :message="roomForm.errors.capacity" />
                         </div>
                         <div>
-                            <InputLabel for="location_type" value="ประเภทห้อง" />
-                            <select id="location_type" v-model="roomForm.location_type" class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30 focus:bg-white transition-all duration-300">
-                                <option value="Lecture">ห้องบรรยาย (Lecture)</option>
-                                <option value="Lab">ห้องปฏิบัติการ (Lab)</option>
-                                <option value="Ward">หอผู้ป่วย (Ward)</option>
-                                <option value="Online">ออนไลน์ (Online)</option>
+                            <InputLabel for="location_type_id" value="ประเภทห้อง" />
+                            <select id="location_type_id" v-model="roomForm.location_type_id" required class="mt-1 block w-full border-gray-300 focus:border-nursing-500 focus:ring-nursing-500 rounded-lg shadow-sm bg-nursing-50/30 focus:bg-white transition-all duration-300">
+                                <option value="" disabled>-- เลือกประเภท --</option>
+                                <option v-for="type in locationTypes" :key="type.id" :value="type.id">
+                                    {{ type.type_name }}
+                                </option>
                             </select>
-                            <InputError class="mt-2" :message="roomForm.errors.location_type" />
+                            <InputError class="mt-2" :message="roomForm.errors.location_type_id" />
                         </div>
                     </div>
 
