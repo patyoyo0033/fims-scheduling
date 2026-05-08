@@ -8,7 +8,9 @@ use App\Models\Schedule;
 use App\Models\StudentGroup;
 use App\Models\User;
 use App\Models\ActivityType;
+use App\Models\PracticumSeries;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -93,7 +95,8 @@ class ScheduleController extends Controller
         $validated = $request->validate([
             'course_offering_id' => 'required|exists:course_offerings,id',
             'activity_type_id'   => 'required|exists:activity_types,id',
-            'user_id'            => 'required|exists:users,id',
+            'instructor_ids'     => 'required|array|min:1',
+            'instructor_ids.*'   => 'exists:users,id',
             'teaching_date'      => 'required|date',
             'start_time'         => 'required|date_format:H:i',
             'end_time'           => 'required|date_format:H:i|after:start_time',
@@ -126,7 +129,7 @@ class ScheduleController extends Controller
                         'end_time'         => $request->end_time,
                         'room_id'          => $rotation['room_id'],
                         'student_group_id' => $rotation['student_group_id'],
-                        'user_id'          => $request->user_id,
+                        'instructor_ids'   => $request->instructor_ids,
                         'is_rotation'      => true,
                         'rotation_index'   => $index,
                     ];
@@ -140,7 +143,7 @@ class ScheduleController extends Controller
                     'end_time'         => $request->end_time,
                     'room_id'          => $request->room_id,
                     'student_group_id' => $request->student_group_id,
-                    'user_id'          => $request->user_id,
+                    'instructor_ids'   => $request->instructor_ids,
                     'is_rotation'      => false,
                 ];
             }
@@ -178,11 +181,13 @@ class ScheduleController extends Controller
                 }
 
                 // Instructor Conflict
-                if ($existing->instructors->contains('id', $p['user_id'])) {
-                    $teacher = User::find($p['user_id']);
-                    throw ValidationException::withMessages([
-                        'user_id' => "อาจารย์ {$teacher->name} ติดสอนตารางอื่น {$timeConflictMsg}"
-                    ]);
+                foreach ($p['instructor_ids'] as $instructorId) {
+                    if ($existing->instructors->contains('id', $instructorId)) {
+                        $teacher = User::find($instructorId);
+                        throw ValidationException::withMessages([
+                            'instructor_ids' => "อาจารย์ {$teacher->name} ติดสอนตารางอื่น {$timeConflictMsg}"
+                        ]);
+                    }
                 }
 
                 // Student Group Conflict
@@ -214,34 +219,47 @@ class ScheduleController extends Controller
 
         // --- 4. Database Insert ---
         DB::transaction(function () use ($request, $dates) {
+            $practicumSeriesId = null;
+            if ($request->is_recurring) {
+                $series = PracticumSeries::create([
+                    'course_offering_id' => $request->course_offering_id,
+                    'name'               => 'Series ' . Str::uuid()->toString(),
+                    'start_date'         => reset($dates),
+                    'end_date'           => end($dates),
+                ]);
+                $practicumSeriesId = $series->id;
+            }
+
             if ($request->is_rotation) {
                 foreach ($dates as $dateStr) {
                     foreach ($request->rotations as $rotation) {
                         $schedule = Schedule::create([
-                            'course_offering_id' => $request->course_offering_id,
-                            'activity_type_id'   => $request->activity_type_id,
-                            'room_id'            => $rotation['room_id'],
-                            'teaching_date'      => $dateStr,
-                            'start_time'         => $request->start_time,
-                            'end_time'           => $request->end_time,
-                            'status'             => 'draft',
+                            'course_offering_id'  => $request->course_offering_id,
+                            'activity_type_id'    => $request->activity_type_id,
+                            'practicum_series_id' => $practicumSeriesId,
+                            'room_id'             => $rotation['room_id'],
+                            'teaching_date'       => $dateStr,
+                            'start_time'          => $request->start_time,
+                            'end_time'            => $request->end_time,
+                            'status'              => 'draft',
                         ]);
-                        $schedule->instructors()->attach($request->user_id, ['is_lead' => true]);
+                        $schedule->instructors()->attach($request->instructor_ids);
                         $schedule->studentGroups()->attach($rotation['student_group_id']);
                     }
                 }
             } else {
                 foreach ($dates as $dateStr) {
                     $schedule = Schedule::create([
-                        'course_offering_id' => $request->course_offering_id,
-                        'activity_type_id'   => $request->activity_type_id,
-                        'room_id'            => $request->room_id,
-                        'teaching_date'      => $dateStr,
-                        'start_time'         => $request->start_time,
-                        'end_time'           => $request->end_time,
-                        'status'             => 'draft',
+                        'course_offering_id'  => $request->course_offering_id,
+                        'activity_type_id'    => $request->activity_type_id,
+                        'practicum_series_id' => $practicumSeriesId,
+                        'room_id'             => $request->room_id,
+                        'teaching_date'       => $dateStr,
+                        'start_time'          => $request->start_time,
+                        'end_time'            => $request->end_time,
+                        'status'              => 'draft',
                     ]);
-                    $schedule->instructors()->attach($request->user_id, ['is_lead' => true]);
+                    $schedule->instructors()->attach($request->instructor_ids);
                     $schedule->studentGroups()->attach($request->student_group_id);
                 }
             }

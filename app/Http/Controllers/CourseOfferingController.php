@@ -126,7 +126,14 @@ class CourseOfferingController extends Controller
      */
     public function destroy(CourseOffering $courseOffering)
     {
-        $courseOffering->delete();
-        return redirect()->back()->with('success', 'ลบรายวิชาที่เปิดสอนสำเร็จ');
+        try {
+            $courseOffering->delete();
+            return redirect()->back()->with('success', 'ลบรายวิชาที่เปิดสอนสำเร็จ');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1451 || $e->getCode() == '23000') {
+                return redirect()->back()->with('error', 'ไม่สามารถลบข้อมูลได้ เนื่องจากข้อมูลนี้ถูกใช้งานอยู่ในระบบแล้ว');
+            }
+            throw $e;
+        }
     }
 }

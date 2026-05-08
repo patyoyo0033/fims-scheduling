@@ -58,8 +58,15 @@ class MasterDataController extends Controller
 
     public function destroyRoom(Room $room)
     {
-        $room->delete();
-        return redirect()->back()->with('success', 'ลบข้อมูลห้องเรียนสำเร็จ');
+        try {
+            $room->delete();
+            return redirect()->back()->with('success', 'ลบข้อมูลห้องเรียนสำเร็จ');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1451 || $e->getCode() == '23000') {
+                return redirect()->back()->with('error', 'ไม่สามารถลบข้อมูลได้ เนื่องจากข้อมูลนี้ถูกใช้งานอยู่ในระบบแล้ว');
+            }
+            throw $e;
+        }
     }
 
     // ─── Student Group Management ──────────────────────────────────────────
@@ -123,7 +130,14 @@ class MasterDataController extends Controller
 
     public function destroyStudentGroup(StudentGroup $studentGroup)
     {
-        $studentGroup->delete();
-        return redirect()->back()->with('success', 'ลบข้อมูลกลุ่มนักศึกษาสำเร็จ');
+        try {
+            $studentGroup->delete();
+            return redirect()->back()->with('success', 'ลบข้อมูลกลุ่มนักศึกษาสำเร็จ');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1451 || $e->getCode() == '23000') {
+                return redirect()->back()->with('error', 'ไม่สามารถลบข้อมูลได้ เนื่องจากข้อมูลนี้ถูกใช้งานอยู่ในระบบแล้ว');
+            }
+            throw $e;
+        }
     }
 }
