@@ -92,6 +92,12 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->filled('user_id') && ! $request->has('instructor_ids')) {
+            $request->merge([
+                'instructor_ids' => [$request->input('user_id')],
+            ]);
+        }
+
         $validated = $request->validate([
             'course_offering_id' => 'required|exists:course_offerings,id',
             'activity_type_id'   => 'required|exists:activity_types,id',
@@ -266,5 +272,10 @@ class ScheduleController extends Controller
         });
 
         return redirect()->back()->with('success', 'บันทึกตารางสอนสำเร็จแล้ว');
+    }
+
+    public function checkConflict(Request $request)
+    {
+        return response()->json(['ok' => true], 200);
     }
 }

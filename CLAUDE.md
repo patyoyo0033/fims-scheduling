@@ -86,12 +86,12 @@ tailwind.config.js                  # Custom `nursing` color palette + glassmorp
 
 1. **Inertia.js SPA** — No separate API; controllers return `Inertia::render()` with props.
 2. **`useForm` for all mutations** — Vue forms use `@inertiajs/vue3` `useForm()` for state + submission.
-3. **Mass Insert pattern** — `ScheduleController::store()` builds an array of rows and calls `Schedule::insert()` once instead of N individual creates.
+3. **Per-row schedule creation** - `ScheduleController::store()` creates independent `schedules` rows, including one row per recurring occurrence.
 4. **`exclude_if` validation** — Conditional validation rules using `exclude_if:is_rotation,true/false` to cleanly separate standard vs. rotation form data.
-5. **JSON `settings` column** — `course_offerings.settings` stores practicum-specific config (e.g., `max_students_per_group`) as flexible JSON instead of rigid columns.
+5. **Recurring schedules at application level** - recurring entries are expanded into individual `schedules` rows; there is no `recurrence_rule` column.
 6. **Cascade rules** — Deleting a Course cascades to CourseOfferings; deleting a User nullifies `coordinator_id`.
 
-## Database Schema (7 domain tables)
+## Database Schema (Scheduling domain)
 
 ```
 users ──────────────────┐
@@ -105,12 +105,12 @@ courses ────────────┤   │
 course_offerings ───┘───┘  (course_id + academic_year_id + coordinator_id FKs)
     │
     ▼
-schedules  (course_id FK, user_id FK, room_id FK)
+schedules  (course_offering_id FK, activity_type_id FK, practicum_series_id FK, room_id FK)
     │
 rooms ──────────────────┘
 ```
 
-> **⚠️ Known schema mismatch**: The `schedules` table currently uses `course_id` (FK to courses) and `student_group` (VARCHAR text), not `course_offering_id` / `student_group_id` FKs. This is legacy from Sprint 1 and is a known migration debt.
+`schedules.status` enum values are `['draft', 'pending_approval', 'approved', 'revised', 'cancelled']`.
 
 ## Route Map
 
@@ -139,9 +139,11 @@ rooms ──────────────────┘
 4. **No Edit/Delete for schedules** — Only Create exists; update/destroy methods are not implemented.
 5. **Foreign key delete risk** — Deleting a Room/Group used in schedules triggers a raw 500 error (no try/catch).
 6. **No UI for Courses or Academic Years** — These are seeder-only; no admin CRUD pages exist.
-7. **`schedules` table schema is Sprint 1 legacy** — Uses `course_id` + `student_group` (string) instead of `course_offering_id` + `student_group_id` (FK).
+7. **Data Dictionary is not fully synced yet** - `DataDictionary.md` still needs a dedicated pass to match the latest migrations.
 
 ## Testing
+
+Scheduling database tests must run on MySQL, not SQLite, because the migrations use MySQL-specific `ALTER TABLE ... MODIFY` syntax for enum changes.
 
 Default seeder credentials:
 - **Admin**: `admin@fims.com` / `password`

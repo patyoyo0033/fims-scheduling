@@ -11,17 +11,12 @@ class CourseOffering extends Model
         'course_id',
         'academic_year_id',
         'coordinator_id',
-        'is_practicum',
-        'settings',
+        'approval_status',
+        'rejection_reason',
+        'planned_activity_count',
+        'planned_lecture_hours',
+        'planned_lab_hours',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'is_practicum' => 'boolean',
-            'settings'     => 'array',   // JSON ↔ PHP Array อัตโนมัติ
-        ];
-    }
 
     // ─── Relationships ────────────────────────────────────────────
 

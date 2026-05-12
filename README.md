@@ -1,3 +1,36 @@
+# FIMS Scheduling System
+
+Internal scheduling module for the Faculty of Nursing scheduling workflow. The project uses Laravel, Inertia.js, Vue 3, and MySQL.
+
+Current database notes are documented in [docs/DATABASE_DESIGN_SNAPSHOT.md](docs/DATABASE_DESIGN_SNAPSHOT.md).
+
+## Testing with MySQL
+
+Scheduling database tests must run on MySQL, not SQLite. The scheduling migrations use MySQL-specific SQL, including `ALTER TABLE ... MODIFY` for the `schedules.status` enum, which SQLite does not support.
+
+Example PowerShell overrides for local test runs:
+
+```powershell
+$env:APP_ENV='testing'
+$env:DB_CONNECTION='mysql'
+$env:DB_HOST='127.0.0.1'
+$env:DB_PORT='3306'
+$env:DB_DATABASE='fims_db_test'
+$env:DB_USERNAME='root'
+$env:DB_PASSWORD=''
+
+php artisan test --filter=ScheduleDatabaseTest
+php artisan test --filter=ScheduleControllerTest
+```
+
+Create the test database before running the tests:
+
+```sql
+CREATE DATABASE IF NOT EXISTS fims_db_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
